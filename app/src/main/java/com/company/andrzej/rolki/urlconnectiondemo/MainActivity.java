@@ -36,8 +36,12 @@ public class MainActivity extends AppCompatActivity {
         btnHit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new JSONTASK().execute("https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesDemoItem.txt");
+//                new JSONTASK().execute("https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesDemoItem.txt");
+
+                new JSONTASK().execute("https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesDemoList.txt");
+
             }
+
         });
 
     }
@@ -68,13 +72,16 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject parentObject = new JSONObject(finalJson);
                 JSONArray parentArray = parentObject.getJSONArray("movies");
 
-                JSONObject finalObject = parentArray.getJSONObject(0);
 
-                String moviewName = finalObject.getString("movie");
-                int year = finalObject.getInt("year");
+                StringBuffer finalBufferedData = new StringBuffer();
+                for(int i = 0; i < parentArray.length(); i++){
+                    JSONObject finalObject = parentArray.getJSONObject(i);
+                    String moviewName = finalObject.getString("movie");
+                    int year = finalObject.getInt("year");
+                    finalBufferedData.append(moviewName + " - " + year + "\n");
+                }
 
-
-                return moviewName + " - " + year;
+                return finalBufferedData.toString();
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             } finally {
