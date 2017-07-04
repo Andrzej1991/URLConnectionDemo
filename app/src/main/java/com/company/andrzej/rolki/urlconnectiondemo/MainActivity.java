@@ -1,11 +1,19 @@
 package com.company.andrzej.rolki.urlconnectiondemo;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.company.andrzej.rolki.urlconnectiondemo.model.MovieModel;
 
@@ -24,7 +32,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String URL_CONNECT = "https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesData.txt";
+
     private ListView lvMovies;
+
 
     //1 https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesDemoItem.txt
     //2 https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesDemoList.txt
@@ -42,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new JSONTASK().execute("https://jsonparsingdemo-cec5b.firebaseapp.com/jsonData/moviesDemoList.txt");
+                new JSONTASK().execute(URL_CONNECT);
             }
         });
 
@@ -77,31 +88,30 @@ public class MainActivity extends AppCompatActivity {
 
 
                 List<MovieModel> movieModelList = new ArrayList<>();
-                for (int i = 0; i < parentArray.length(); i++) {
-                    StringBuffer finalBufferedData = new StringBuffer();
-                    JSONObject finalObject = parentArray.getJSONObject(i);
-                    MovieModel movieModel = new MovieModel();
 
-                    movieModel.setMovie(finalObject.getString("movie"));
-                    movieModel.setYear(finalObject.getInt("year"));
-                    movieModel.setRating((float) finalObject.getDouble("rating"));
-                    movieModel.setDirector(finalObject.getString("director"));
-                    movieModel.setDuration(finalObject.getString("duration"));
-                    movieModel.setTagline(finalObject.getString("tagline"));
-                    movieModel.setImage(finalObject.getString("image"));
-                    movieModel.setStory(finalObject.getString("story"));
+                    for(int i=0; i<parentArray.length(); i++) {
+                        MovieModel movieModel = new MovieModel();
+                        JSONObject finalObject = parentArray.getJSONObject(i);
 
-                    List<MovieModel.Cast> castList = new ArrayList<>();
-                    for (int j = 0; i < finalObject.getJSONArray("cast").length(); j++) {
-                        MovieModel.Cast cast = new MovieModel.Cast();
-                        cast.setName(finalObject.getJSONArray("cast").getJSONObject(j).getString("name"));
-                        castList.add(cast);
+                        movieModel.setMovie(finalObject.getString("movie"));
+                        movieModel.setYear(finalObject.getInt("year"));
+                        movieModel.setRating((float) finalObject.getDouble("rating"));
+                        movieModel.setDirector(finalObject.getString("director"));
+
+                        movieModel.setDuration(finalObject.getString("duration"));
+                        movieModel.setTagline(finalObject.getString("tagline"));
+                        movieModel.setImage(finalObject.getString("image"));
+                        movieModel.setStory(finalObject.getString("story"));
+
+                        List<MovieModel.Cast> castList = new ArrayList<>();
+                        for(int j=0; j<finalObject.getJSONArray("cast").length(); j++){
+                            MovieModel.Cast cast = new MovieModel.Cast();
+                            cast.setName(finalObject.getJSONArray("cast").getJSONObject(j).getString("name"));
+                            castList.add(cast);
+                        }
+                        movieModel.setCastList(castList);
+                        movieModelList.add(movieModel);
                     }
-                    movieModel.setCastList(castList);
-                    //adding the final object to the list
-                    movieModelList.add(movieModel);
-                }
-
                 return movieModelList;
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
@@ -120,8 +130,88 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<MovieModel> result) {
+        protected void onPostExecute(final List<MovieModel> result) {
             super.onPostExecute(result);
+            if(result != null) {
+                MovieAdapter adapter = new MovieAdapter(getApplicationContext(), R.layout.row, result);
+                lvMovies.setAdapter(adapter);
+            } else {
+                Toast.makeText(getApplicationContext(), "Not able to fetch data from server, please check url.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
+
+    public class MovieAdapter extends ArrayAdapter{
+
+        private List<MovieModel> movieModelList;
+        private int resource;
+        private LayoutInflater inflater;
+        public MovieAdapter(Context context, int resource, List<MovieModel> objects) {
+            super(context, resource, objects);
+            movieModelList = objects;
+            this.resource = resource;
+            inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder holder = null;
+
+            if(convertView == null){
+                holder = new ViewHolder();
+                convertView = inflater.inflate(resource, null);
+                holder.ivMovieIcon = (ImageView)convertView.findViewById(R.id.ivIcon);
+                holder.tvMovie = (TextView)convertView.findViewById(R.id.movieName);
+                holder.tvTagline = (TextView)convertView.findViewById(R.id.tagLine);
+                holder.tvYear = (TextView)convertView.findViewById(R.id.year);
+                holder.tvDuration = (TextView)convertView.findViewById(R.id.duration);
+                holder.tvDirector = (TextView)convertView.findViewById(R.id.director);
+                holder.rbMovieRating = (RatingBar)convertView.findViewById(R.id.ratingBar);
+                holder.tvCast = (TextView)convertView.findViewById(R.id.tvCast);
+                holder.tvStory = (TextView)convertView.findViewById(R.id.story);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            // Then later, when you want to display image
+            final ViewHolder finalHolder = holder;
+
+            holder.tvMovie.setText(movieModelList.get(position).getMovie());
+            holder.tvTagline.setText(movieModelList.get(position).getTagline());
+            holder.tvYear.setText("Year: " + movieModelList.get(position).getYear());
+            holder.tvDuration.setText("Duration:" + movieModelList.get(position).getDuration());
+            holder.tvDirector.setText("Director:" + movieModelList.get(position).getDirector());
+
+            // rating bar
+            holder.rbMovieRating.setRating(movieModelList.get(position).getRating()/2);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            for(MovieModel.Cast cast : movieModelList.get(position).getCastList()){
+                stringBuffer.append(cast.getName() + ", ");
+            }
+
+            holder.tvCast.setText("Cast:" + stringBuffer);
+            holder.tvStory.setText(movieModelList.get(position).getStory());
+            return convertView;
+        }
+
+
+        class ViewHolder{
+            private ImageView ivMovieIcon;
+            private TextView tvMovie;
+            private TextView tvTagline;
+            private TextView tvYear;
+            private TextView tvDuration;
+            private TextView tvDirector;
+            private RatingBar rbMovieRating;
+            private TextView tvCast;
+            private TextView tvStory;
+        }
+
+    }
+
+
 }
