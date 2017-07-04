@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivIcon"
+                android:layout_width="120dp"
+                android:layout_height="160dp"
+                app:srcCompat="@android:drawable/btn_star_big_on" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/movieName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="movieName"
+                android:textColor="@android:color/black"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tagLine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tagLine"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/year"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="year"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="duration"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/director"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="director"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:stepSize="5" />
+
+        <TextView
+            android:id="@+id/tvCast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cast"
+            android:textColor="@android:color/black"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/story"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvStory"
+            android:textColor="@android:color/background_dark" />
+    </LinearLayout>
+</LinearLayout>
