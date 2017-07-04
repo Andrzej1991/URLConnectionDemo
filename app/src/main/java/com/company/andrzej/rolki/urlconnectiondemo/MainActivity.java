@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class JSONTASK extends AsyncTask<String, String, String> {
+    private class JSONTASK extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... urls) {
@@ -58,8 +62,20 @@ public class MainActivity extends AppCompatActivity {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
-                return buffer.toString();
-            } catch (IOException e) {
+
+                String finalJson = buffer.toString();
+
+                JSONObject parentObject = new JSONObject(finalJson);
+                JSONArray parentArray = parentObject.getJSONArray("movies");
+
+                JSONObject finalObject = parentArray.getJSONObject(0);
+
+                String moviewName = finalObject.getString("movie");
+                int year = finalObject.getInt("year");
+
+
+                return moviewName + " - " + year;
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             } finally {
                 if (connection != null)
